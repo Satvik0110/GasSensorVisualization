@@ -1,5 +1,5 @@
 import { Line } from 'react-chartjs-2';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
@@ -7,8 +7,10 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 function CSVGraph() {
   const [graphData, setGraphData] = useState([]);
+  const [displayData, setDisplayData] = useState([]);
   const [isFileUploaded, setIsFileUploaded] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -30,6 +32,7 @@ function CSVGraph() {
           .filter(item => item && !isNaN(item.value));
         
         setGraphData(parsedData);
+        setDisplayData([]);
         setIsFileUploaded(true);
         setShowGraph(false);
       };
@@ -39,14 +42,29 @@ function CSVGraph() {
 
   const handleDisplayGraph = () => {
     setShowGraph(true);
+    setIsAnimating(true);
+    setDisplayData([]); // Reset display data
   };
 
+  // Animation effect
+  useEffect(() => {
+    if (showGraph && isAnimating && displayData.length < graphData.length) {
+      const timer = setTimeout(() => {
+        setDisplayData(prev => [...prev, graphData[prev.length]]);
+      }, 100); // Adjust this value to control animation speed (milliseconds)
+
+      return () => clearTimeout(timer);
+    } else if (displayData.length === graphData.length) {
+      setIsAnimating(false);
+    }
+  }, [showGraph, displayData, graphData, isAnimating]);
+
   const chartData = {
-    labels: graphData.map((data) => data.timestamp),
+    labels: displayData.map((data) => data.timestamp),
     datasets: [
       {
         label: 'CSV Data',
-        data: graphData.map((data) => data.value),
+        data: displayData.map((data) => data.value),
         fill: false,
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.1,
@@ -80,6 +98,9 @@ function CSVGraph() {
         },
       },
     },
+    animation: {
+      duration: 0 // Disable default animations
+    }
   };
 
   return (
@@ -99,14 +120,20 @@ function CSVGraph() {
           <button 
             onClick={handleDisplayGraph}
             style={{ marginLeft: '1rem' }}
+            disabled={isAnimating}
           >
-            Display Graph
+            {isAnimating ? 'Plotting...' : 'Display Graph'}
           </button>
         )}
       </div>
       <div>
         {showGraph && <Line data={chartData} options={chartOptions} />}
       </div>
+      {isAnimating && (
+        <div style={{ marginTop: '10px' }}>
+          Plotting points: {displayData.length} of {graphData.length}
+        </div>
+      )}
     </div>
   );
 }
