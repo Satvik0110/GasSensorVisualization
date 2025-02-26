@@ -69,18 +69,10 @@ function App() {
       <Routes>
         <Route path="/csvGraph" element={<CSVGraph />} />
         <Route path="/" element={
-          <div>
+          <div className="container">
             <h2>Sensor Dashboard</h2>
-            <div style={{ marginBottom: '20px' }}>
-              <Link to="/csvGraph" style={{
-                padding: '8px 16px',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                textDecoration: 'none',
-                borderRadius: '4px',
-                marginBottom: '20px',
-                display: 'inline-block'
-              }}>
+            <div>
+              <Link to="/csvGraph" className="csv-link">
                 Go to CSV Graph
               </Link>
             </div>
@@ -90,23 +82,24 @@ function App() {
                 type="file" 
                 accept=".csv"
                 onChange={handleFileUpload}
-                style={{ marginBottom: '1rem' }}
               />
             </div>
-            <button onClick={getContinuousData}>Get</button>
-            <button onClick={stopData}>Stop</button>
-            <button onClick={resetData}>Reset</button>
-            <div>
-            <Graph graphData={graphData} />
+            <div className="button-container">
+              <button className="get-button" onClick={getContinuousData}>Get</button>
+              <button className="stop-button" onClick={stopData}>Stop</button>
+              <button className="reset-button" onClick={resetData}>Reset</button>
+            </div>
+            <div className="graph-container">
+              <Graph graphData={graphData} />
             </div>
           </div>
         } />
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
 
 
      

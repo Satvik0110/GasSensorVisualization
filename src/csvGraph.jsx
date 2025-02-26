@@ -51,7 +51,7 @@ function CSVGraph() {
     if (showGraph && isAnimating && displayData.length < graphData.length) {
       const timer = setTimeout(() => {
         setDisplayData(prev => [...prev, graphData[prev.length]]);
-      }, 100); // Adjust this value to control animation speed (milliseconds)
+      }, 0.0001); // Adjust this value to control animation speed (milliseconds)
 
       return () => clearTimeout(timer);
     } else if (displayData.length === graphData.length) {
@@ -106,7 +106,9 @@ function CSVGraph() {
   return (
     <div>
       <div style={{ marginBottom: '20px' }}>
-        <Link to="/">← Back to Real-time Dashboard</Link>
+        <Link to="/" classname="back-button">
+          ← Back to Real-time Dashboard
+        </Link>
       </div>
       <h2>CSV Data Visualization</h2>
       <div>
