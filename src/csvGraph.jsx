@@ -99,7 +99,7 @@ function CSVGraph() {
       },
     },
     animation: {
-      duration: 0 // Disable default animations
+      duration: 0 // Disable default animations change this value to control animation speed (milliseconds)
     }
   };
 

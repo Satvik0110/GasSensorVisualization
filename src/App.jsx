@@ -55,7 +55,7 @@ function App() {
             timestamp: timestamp.trim(),
             value: parseFloat(value.trim())
           };
-        }).filter(item => !isNaN(item.value));  // Remove any invalid entries
+        }).filter(item => !isNaN(item.value));  // Remove any invalid entries (error handling
         
         setgraphData(parsedData);
       };
