@@ -9,7 +9,7 @@ function App() {
 
   const getData= async () => {
     try{
-      const response= await axios.get('http://192.168.228.254/json');
+      const response= await axios.get('http://192.168.181.254/json');
       console.log(response.data);
       setgraphData((prevgraphData) => [...prevgraphData, response.data]);
     }
@@ -20,10 +20,23 @@ function App() {
 
   const getContinuousData =  () =>{
     if(!intervalID){
-      const id= setInterval(getData,1000);
+      const id= setInterval(getData,2000);
       setintervalID(id);
     }
   }
+
+  const downloadCSV = () => {
+    const csvContent = "data:text/csv;charset=utf-8," +
+      "timestamp,value\n" +
+      graphData.map(data => `${data.timestamp},${data.value}`).join("\n");
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "sensor_data.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
 
   const stopData =  () =>{
     if(intervalID){
@@ -31,6 +44,7 @@ function App() {
       setintervalID(null);
       console.log('Stopped');
       console.log(graphData);
+      downloadCSV();
     }
   }
 
