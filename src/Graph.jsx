@@ -4,54 +4,79 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 // Register necessary Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const Graph = ({graphData}) => {
-// Prepare data for Chart.js
-const chartData = {
-  labels: graphData.map((data) => data.timestamp), // Use 'time' for x-axis labels
-  datasets: [
-    {
-      label: 'Sensor Value',
-      data: graphData.map((data) => data.value), // Use 'value' for y-axis data
-      fill: false,
-      borderColor: 'rgb(75, 192, 192)',
-      tension: 0.1,
-    },
-  ],
-};
+const Graph = ({ graphData }) => {
+  // Prepare data for Chart.js with multiple datasets
+  const chartData = {
+    labels: graphData.map((data) => data.timestamp), // X-axis labels (timestamps)
+    datasets: [
+      {
+        label: 'Sensor 1',
+        data: graphData.map((data) => data.val1),
+        borderColor: 'rgb(255, 99, 132)',
+        fill: false,
+        tension: 0.1,
+      },
+      {
+        label: 'Sensor 2',
+        data: graphData.map((data) => data.val2),
+        borderColor: 'rgb(54, 162, 235)',
+        fill: false,
+        tension: 0.1,
+      },
+      {
+        label: 'Sensor 3',
+        data: graphData.map((data) => data.val3),
+        borderColor: 'rgb(255, 206, 86)',
+        fill: false,
+        tension: 0.1,
+      },
+      {
+        label: 'Sensor 4',
+        data: graphData.map((data) => data.val4),
+        borderColor: 'rgb(75, 192, 192)',
+        fill: false,
+        tension: 0.1,
+      },
+      {
+        label: 'Sensor 5',
+        data: graphData.map((data) => data.val5),
+        borderColor: 'rgb(153, 102, 255)',
+        fill: false,
+        tension: 0.1,
+      },
+    ],
+  };
 
-const chartOptions = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: 'top',
-    },
-    tooltip: {
-      mode: 'index',
-      intersect: false,
-    },
-  },
-  scales: {
-    x: {
-      type: 'category', // For time-based x-axis
-      title: {
-        display: true,
-        text: 'Time',
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
       },
     },
-    y: {
-      min: 0,
-      title: {
-        display: true,
-        text: 'Sensor Value',
+    scales: {
+      x: {
+        type: 'category', // For time-based x-axis
+        title: {
+          display: true,
+          text: 'Time',
+        },
+      },
+      y: {
+        min: 0,
+        title: {
+          display: true,
+          text: 'Sensor Values',
+        },
       },
     },
-  },
+  };
+
+  return <Line data={chartData} options={chartOptions} />;
 };
-
-
-  return (
-    <Line data={chartData} options={chartOptions} />
-  )
-}
 
 export default Graph;
