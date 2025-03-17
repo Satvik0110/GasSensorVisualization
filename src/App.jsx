@@ -11,7 +11,8 @@ function App() {
 
   const getData= async () => {
     try{
-      const response= await axios.get('http://192.168.181.254/json');
+      // const response= await axios.get('http://192.168.181.254/json');
+      const response= await axios.get('http://localhost:5000/api/data');
       console.log(response.data);
       setgraphData((prevgraphData) => [...prevgraphData, response.data]);
     }
@@ -29,31 +30,34 @@ function App() {
 
   const downloadCSV = () => {
     const csvContent = "data:text/csv;charset=utf-8," +
-      "timestamp,value\n" +
-      graphData.map(data => `${data.timestamp},${data.value}`).join("\n");
-    
+        "timestamp,value1,value2,value3,value4,value5\n" +  // Ensure newline after headers
+        graphData.map(data => 
+            `${data.timestamp},${data.val1},${data.val2},${data.val3},${data.val4},${data.val5}` // Ensure proper column separation
+        ).join("\n");
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "sensor_data.csv");
     document.body.appendChild(link);
     link.click();
-  };
+};
+
 
   const stopData =  () =>{
     if(intervalID){
        clearInterval(intervalID);
       setintervalID(null);
-      console.log('Stopped');
-      console.log(graphData);
-      downloadCSV();
     }
   }
 
   const resetData =  () =>{
-    console.log("Data reset!!");
-    setgraphData([]);
+    const userConfirmed = window.confirm("Do you want to download the CSV before resetting data?");
+    if (userConfirmed) {
+        downloadCSV();
+    }
     stopData();
+    setgraphData([]);
   }
 
   const handleFileUpload = (event) => {
