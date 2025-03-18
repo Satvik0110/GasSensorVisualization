@@ -57,6 +57,7 @@ function App() {
     if (userConfirmed) {
         downloadCSV();
     }
+    setSensorData(null);
     stopData();
     setgraphData([]);
   }
