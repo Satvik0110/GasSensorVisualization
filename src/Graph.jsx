@@ -37,13 +37,6 @@ const Graph = ({ graphData }) => {
         fill: false,
         tension: 0.1,
       },
-      {
-        label: 'Sensor 5',
-        data: graphData.map((data) => data.val5),
-        borderColor: 'rgb(153, 102, 255)',
-        fill: false,
-        tension: 0.1,
-      },
     ],
   };
 
