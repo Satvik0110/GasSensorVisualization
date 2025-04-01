@@ -121,6 +121,7 @@ function CSVGraph() {
         {isFileUploaded && (
           <button 
             onClick={handleDisplayGraph}
+            
             className="display-button"
             disabled={isAnimating}
           >

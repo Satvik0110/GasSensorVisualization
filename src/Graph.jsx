@@ -72,4 +72,5 @@ const Graph = ({ graphData }) => {
   return <Line data={chartData} options={chartOptions} />;
 };
 
+
 export default Graph;
