@@ -63,7 +63,7 @@ const Graph = ({ graphData }) => {
         min: 0,
         title: {
           display: true,
-          text: 'Sensor Values',
+          text: 'Volts',
         },
       },
     },
@@ -71,5 +71,6 @@ const Graph = ({ graphData }) => {
 
   return <Line data={chartData} options={chartOptions} />;
 };
+
 
 export default Graph;
