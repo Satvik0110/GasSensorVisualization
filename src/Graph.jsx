@@ -63,7 +63,7 @@ const Graph = ({ graphData }) => {
         min: 0,
         title: {
           display: true,
-          text: 'Sensor Values',
+          text: 'Volts',
         },
       },
     },

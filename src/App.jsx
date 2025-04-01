@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import CSVGraph from './csvGraph';
 
 function App() {
+  const BUFFER_SIZE = 50; // Define buffer size - adjust this number as needed
   const [graphData, setgraphData]= useState([]);
   const [intervalID, setintervalID]= useState(null);
   const [sensorData, setSensorData]= useState(null);
@@ -14,7 +15,13 @@ function App() {
     try{
       // const response= await axios.get('http://192.168.181.254/json');
       const response= await axios.get('http://localhost:5000/api/data');
-      setgraphData((prevgraphData) => [...prevgraphData, response.data]);
+      setgraphData((prevgraphData) => {
+        // If we exceed buffer size, remove oldest data point
+        if (prevgraphData.length >= BUFFER_SIZE) {
+          return [...prevgraphData.slice(1), response.data];
+        }
+        return [...prevgraphData, response.data];
+      });
       setSensorData(response.data);
     }
     catch(error){
@@ -62,28 +69,6 @@ function App() {
     setgraphData([]);
   }
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target.result;
-        const rows = text.split('\n');
-        const parsedData = rows.slice(1).map(row => {  // slice(1) skips header row
-          const [timestamp, value] = row.split(',');
-          return {
-            timestamp: timestamp.trim(),
-            value: parseFloat(value.trim())
-          };
-        }).filter(item => !isNaN(item.value));  // Remove any invalid entries (error handling
-        
-        setgraphData(parsedData);
-      };
-      reader.readAsText(file);
-    }
-  };
-
-
   return (
     <Router>
       <Routes>
@@ -100,9 +85,6 @@ function App() {
                   </Link>
                 </div>
                 <p>Real-time sensor data visualization</p>
-                <div>
-                  <input type="file" accept=".csv" onChange={handleFileUpload} />
-                </div>
                 <div className="button-container">
                   <button className="get-button" onClick={getContinuousData}>
                     Get

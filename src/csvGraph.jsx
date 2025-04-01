@@ -46,12 +46,12 @@ function CSVGraph() {
     setDisplayData([]); // Reset display data
   };
 
-  // Animation effect
+  // Animation effect without buffer management
   useEffect(() => {
     if (showGraph && isAnimating && displayData.length < graphData.length) {
       const timer = setTimeout(() => {
         setDisplayData(prev => [...prev, graphData[prev.length]]);
-      }, 0.0001); // Adjust this value to control animation speed (milliseconds)
+      }, 0.0001);
 
       return () => clearTimeout(timer);
     } else if (displayData.length === graphData.length) {
@@ -94,7 +94,7 @@ function CSVGraph() {
       y: {
         title: {
           display: true,
-          text: 'Value',
+          text: 'Volts',
         },
       },
     },
@@ -104,14 +104,14 @@ function CSVGraph() {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: '20px' }}>
-        <Link to="/" classname="back-button">
-          ← Back to Real-time Dashboard
+    <div className="container">
+      <div style={{ margin: '10px 0 20px 10px' }}>
+        <Link to="/" className="back-button">
+          Back to Real-time Dashboard
         </Link>
       </div>
       <h2>CSV Data Visualization</h2>
-      <div>
+      <div className="upload-container">
         <input 
           type="file" 
           accept=".csv"
@@ -121,7 +121,7 @@ function CSVGraph() {
         {isFileUploaded && (
           <button 
             onClick={handleDisplayGraph}
-            style={{ marginLeft: '1rem' }}
+            className="display-button"
             disabled={isAnimating}
           >
             {isAnimating ? 'Plotting...' : 'Display Graph'}
