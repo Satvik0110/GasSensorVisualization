@@ -6,29 +6,35 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import CSVGraph from './csvGraph';
 
 function App() {
-  const BUFFER_SIZE = 50; // Define buffer size - adjust this number as needed
+  const BUFFER_SIZE = 300; // Define buffer size - adjust this number as needed
   const [graphData, setgraphData]= useState([]);
   const [intervalID, setintervalID]= useState(null);
   const [sensorData, setSensorData]= useState(null);
 
-  const getData= async () => {
-    try{
-      // const response= await axios.get('http://192.168.181.254/json');
-      //sensor1: 5, sensor2: 10,
-      const response= await axios.get('http://10.115.139.170:5000/json');
+  const getData = async () => {
+    try {
+      const response = await axios.get('http://10.115.139.254/json');
+  
+      // Add timestamp to the fetched data
+      const dataWithTimestamp = {
+        ...response.data,
+        timestamp: Date.now()  // <-- Add current timestamp here
+      };
+  
       setgraphData((prevgraphData) => {
-        // If we exceed buffer size, remove oldest data point
+        // Keep the buffer size fixed
         if (prevgraphData.length >= BUFFER_SIZE) {
-          return [...prevgraphData.slice(1), response.data];
+          return [...prevgraphData.slice(1), dataWithTimestamp];
         }
-        return [...prevgraphData, response.data];
+        return [...prevgraphData, dataWithTimestamp];
       });
-      setSensorData(response.data);
-    }
-    catch(error){
+  
+      setSensorData(dataWithTimestamp);
+    } catch (error) {
       console.log(error);
     }
   }
+  
 
   const getContinuousData =  () =>{
     if(!intervalID){
@@ -39,9 +45,9 @@ function App() {
 
   const downloadCSV = () => {
     const csvContent = "data:text/csv;charset=utf-8," +
-        "timestamp,value1,value2,value3,value4\n" +  // Ensure newline after headers
+        "timestamp,voltage,\n" +  // Ensure newline after headers
         graphData.map(data => 
-            `${data.Timestamp},${data.value1},${data.value2},${data.value3},${data.value4}` // Ensure proper column separation
+            `${data.timestamp},${data.voltage}` // Ensure proper column separation
         ).join("\n");
 
     const encodedUri = encodeURI(csvContent);
@@ -95,12 +101,12 @@ function App() {
                 </div>
                 {sensorData && (
                   <>
-                    <div>Sensor 1 Value: {sensorData.value1}</div>
-                    <div>Sensor 2 Value: {sensorData.value2}</div>
+                    <div>Voltage Value: {sensorData.voltage}</div>
+                    {/* <div>Sensor 2 Value: {sensorData.value2}</div>
                     <div>Sensor 3 Value: {sensorData.value3}</div>
                     <div>Sensor 4 Value: {sensorData.value4}</div>
-                    <div>Temperature Value: {sensorData.temperature}</div>
-                    <div>Humidity Value: {sensorData.humidity}</div>
+                    <div>Temperature Value: {sensorData.Temperature}</div>
+                    <div>Humidity Value: {sensorData.Humidity}</div> */}
                   </>
                 )}
                 <div className="graph-container">
