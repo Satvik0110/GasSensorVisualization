@@ -15,7 +15,7 @@ function App() {
     try{
       // const response= await axios.get('http://192.168.181.254/json');
       //sensor1: 5, sensor2: 10,
-      const response= await axios.get('http://10.115.139.170:5000/json');
+      const response= await axios.get('http://localhost:5000/api/data');
       setgraphData((prevgraphData) => {
         // If we exceed buffer size, remove oldest data point
         if (prevgraphData.length >= BUFFER_SIZE) {
@@ -32,16 +32,16 @@ function App() {
 
   const getContinuousData =  () =>{
     if(!intervalID){
-      const id= setInterval(getData,1000);
+      const id= setInterval(getData,2000);
       setintervalID(id);
     }
   }
 
   const downloadCSV = () => {
     const csvContent = "data:text/csv;charset=utf-8," +
-        "timestamp,value1,value2,value3,value4\n" +  // Ensure newline after headers
+        "timestamp,voltage,\n" +  // Ensure newline after headers
         graphData.map(data => 
-            `${data.Timestamp},${data.value1},${data.value2},${data.value3},${data.value4}` // Ensure proper column separation
+            `${data.Timestamp},${data.voltage}` // Ensure proper column separation
         ).join("\n");
 
     const encodedUri = encodeURI(csvContent);
@@ -95,12 +95,12 @@ function App() {
                 </div>
                 {sensorData && (
                   <>
-                    <div>Sensor 1 Value: {sensorData.value1}</div>
-                    <div>Sensor 2 Value: {sensorData.value2}</div>
+                    <div>Voltage Value: {sensorData.voltage}</div>
+                    {/* <div>Sensor 2 Value: {sensorData.value2}</div>
                     <div>Sensor 3 Value: {sensorData.value3}</div>
                     <div>Sensor 4 Value: {sensorData.value4}</div>
-                    <div>Temperature Value: {sensorData.temperature}</div>
-                    <div>Humidity Value: {sensorData.humidity}</div>
+                    <div>Temperature Value: {sensorData.Temperature}</div>
+                    <div>Humidity Value: {sensorData.Humidity}</div> */}
                   </>
                 )}
                 <div className="graph-container">

@@ -7,36 +7,15 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 const Graph = ({ graphData }) => {
   // Prepare data for Chart.js with multiple datasets
   const chartData = {
-    labels: graphData.map((data) => data.Timestamp), // X-axis labels (timestamps)
+    labels: graphData.map((data) => data.timestamp), // X-axis labels (timestamps)
     datasets: [
       {
-        label: 'Sensor 1',
-        data: graphData.map((data) => data.value1),
+        label: 'Voltage',
+        data: graphData.map((data) => data.voltage),
         borderColor: 'rgb(255, 99, 132)',
         fill: false,
         tension: 0.1,
-      },
-      {
-        label: 'Sensor 2',
-        data: graphData.map((data) => data.value2),
-        borderColor: 'rgb(54, 162, 235)',
-        fill: false,
-        tension: 0.1,
-      },
-      {
-        label: 'Sensor 3',
-        data: graphData.map((data) => data.value3),
-        borderColor: 'rgb(255, 206, 86)',
-        fill: false,
-        tension: 0.1,
-      },
-      {
-        label: 'Sensor 4',
-        data: graphData.map((data) => data.value4),
-        borderColor: 'rgb(75, 192, 192)',
-        fill: false,
-        tension: 0.1,
-      },
+      }
     ],
   };
 
