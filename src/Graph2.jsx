@@ -1,17 +1,23 @@
-import { Line } from 'react-chartjs-2'; // Import the Line chart component
+import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 
-// Register necessary Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const Graph = ({ graphData }) => {
-  // Prepare data for Chart.js with multiple datasets
+
+  // Extract voltages
+  const voltages = graphData.map((data) => data.voltage);
+
+  // Compute min and max of the data, with a small margin for visual clarity
+  const minY = Math.min(...voltages) - 0.01;
+  const maxY = Math.max(...voltages) + 0.01;
+
   const chartData = {
-    labels: graphData.map((data) => data.timestamp), // X-axis labels (timestamps)
+    labels: graphData.map((data) => new Date(data.timestamp).toLocaleTimeString()),  // human-readable time
     datasets: [
       {
         label: 'Voltage',
-        data: graphData.map((data) => data.voltage),
+        data: voltages,
         borderColor: 'rgb(255, 99, 132)',
         fill: false,
         tension: 0.1,
@@ -22,24 +28,20 @@ const Graph = ({ graphData }) => {
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        position: 'top',
-      },
-      tooltip: {
-        mode: 'index',
-        intersect: false,
-      },
+      legend: { position: 'top' },
+      tooltip: { mode: 'index', intersect: false },
     },
     scales: {
       x: {
-        type: 'category', // For time-based x-axis
+        type: 'category',
         title: {
           display: true,
           text: 'Time',
         },
       },
       y: {
-        min: 0,
+        min: minY,     // Dynamic lower bound
+        max: maxY,     // Dynamic upper bound
         title: {
           display: true,
           text: 'Volts',
@@ -50,6 +52,5 @@ const Graph = ({ graphData }) => {
 
   return <Line data={chartData} options={chartOptions} />;
 };
-
 
 export default Graph;

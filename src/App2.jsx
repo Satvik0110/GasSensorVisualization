@@ -8,38 +8,42 @@ import logo from './IITJ_COLOURED.png'; // Import the logo
 
 function App() {
   const BUFFER_SIZE = 50; // Define buffer size - adjust this number as needed
-  const [graphData, setgraphData] = useState([]);
-  const [intervalID, setintervalID] = useState(null);
-  const [sensorData, setSensorData] = useState(null);
+  const [graphData, setgraphData]= useState([]);
+  const [intervalID, setintervalID]= useState(null);
+  const [sensorData, setSensorData]= useState(null);
 
-  const getData = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/data');
+  const getData= async () => {
+    try{
+      // const response= await axios.get('http://192.168.181.254/json');
+      //sensor1: 5, sensor2: 10,
+      const response= await axios.get('http://localhost:5000/api/data');
       setgraphData((prevgraphData) => {
+        // If we exceed buffer size, remove oldest data point
         if (prevgraphData.length >= BUFFER_SIZE) {
-          return [...prevgraphData.slice(1), response.data];
+          return [...prevgraphData.slice(1), dataWithTimestamp];
         }
-        return [...prevgraphData, response.data];
+        return [...prevgraphData, dataWithTimestamp];
       });
       setSensorData(response.data);
-    } catch (error) {
+    }
+    catch(error){
       console.log(error);
     }
-  };
+  }
 
-  const getContinuousData = () => {
-    if (!intervalID) {
-      const id = setInterval(getData, 2000);
+  const getContinuousData =  () =>{
+    if(!intervalID){
+      const id= setInterval(getData,2000);
       setintervalID(id);
     }
   };
 
   const downloadCSV = () => {
     const csvContent = "data:text/csv;charset=utf-8," +
-      "timestamp,voltage,\n" +
-      graphData.map(data =>
-        `${data.Timestamp},${data.voltage}`
-      ).join("\n");
+        "timestamp,voltage,\n" +  // Ensure newline after headers
+        graphData.map(data => 
+            `${data.Timestamp},${data.voltage}` // Ensure proper column separation
+        ).join("\n");
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
