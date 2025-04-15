@@ -30,6 +30,7 @@ function App() {
       console.log(error);
     }
   }
+  
 
   const getContinuousData =  () =>{
     if(!intervalID){

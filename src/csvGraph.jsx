@@ -46,6 +46,7 @@ function CSVGraph() {
     setDisplayData([]); // Reset display data
   };
 
+  
   // Animation effect without buffer management
   useEffect(() => {
     if (showGraph && isAnimating && displayData.length < graphData.length) {

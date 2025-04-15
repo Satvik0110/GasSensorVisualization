@@ -55,6 +55,7 @@ function App() {
       setintervalID(null);
     }
   };
+  
 
   const resetData = () => {
     const userConfirmed = window.confirm("Do you want to download the CSV before resetting data?");

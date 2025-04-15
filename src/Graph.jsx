@@ -14,6 +14,7 @@ const Graph = ({ graphData }) => {
     ...graphData.map(data => data.value4),
   ];
 
+  
   // Calculate dynamic min and max with a small margin
   const minY = Math.min(...allValues) - 0.01;
   const maxY = Math.max(...allValues) + 0.01;
