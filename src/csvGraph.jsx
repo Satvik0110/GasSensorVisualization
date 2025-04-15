@@ -11,6 +11,7 @@ function CSVGraph() {
   const [isFileUploaded, setIsFileUploaded] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [sensorLabels, setSensorLabels] = useState([]);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -18,20 +19,19 @@ function CSVGraph() {
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target.result;
-        const rows = text.split('\n');
-        const parsedData = rows
-          .slice(1)
-          .map(row => {
-            if (!row.trim()) return null;
-            const [timestamp, value] = row.split(',');
-            return {
-              timestamp: timestamp.trim(),
-              value: parseFloat(value.trim())
-            };
-          })
-          .filter(item => item && !isNaN(item.value));
-        
+        const rows = text.split('\n').filter(row => row.trim());
+        const headers = rows[0].split(',').map(header => header.trim());
+        const dataRows = rows.slice(1);
+
+        const parsedData = dataRows.map(row => {
+          const values = row.split(',').map(value => value.trim());
+          const timestamp = values[0];
+          const sensorValues = values.slice(1).map(value => parseFloat(value));
+          return { timestamp, sensorValues };
+        });
+
         setGraphData(parsedData);
+        setSensorLabels(headers.slice(1)); // Exclude the first column (timestamp)
         setDisplayData([]);
         setIsFileUploaded(true);
         setShowGraph(false);
@@ -61,15 +61,13 @@ function CSVGraph() {
 
   const chartData = {
     labels: displayData.map((data) => data.timestamp),
-    datasets: [
-      {
-        label: 'CSV Data',
-        data: displayData.map((data) => data.value),
-        fill: false,
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1,
-      },
-    ],
+    datasets: sensorLabels.map((label, index) => ({
+      label: label || `Sensor ${index + 1}`,
+      data: displayData.map((data) => data.sensorValues[index]),
+      fill: false,
+      borderColor: `hsl(${(index * 60) % 360}, 70%, 50%)`, // Generate unique colors
+      tension: 0.1,
+    })),
   };
 
   const chartOptions = {
@@ -94,13 +92,13 @@ function CSVGraph() {
       y: {
         title: {
           display: true,
-          text: 'Volts',
+          text: 'Sensor Values',
         },
       },
     },
     animation: {
-      duration: 0 // Disable default animations change this value to control animation speed (milliseconds)
-    }
+      duration: 0, // Disable default animations
+    },
   };
 
   return (
@@ -121,7 +119,6 @@ function CSVGraph() {
         {isFileUploaded && (
           <button 
             onClick={handleDisplayGraph}
-            
             className="display-button"
             disabled={isAnimating}
           >

@@ -1,48 +1,45 @@
-import './App.css'
+import './App.css';
 import axios from "axios";
 import { useState } from 'react';
 import Graph from './Graph';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import CSVGraph from './csvGraph';
+import logo from './IITJ_COLOURED.png'; // Import the logo
 
 function App() {
   const BUFFER_SIZE = 50; // Define buffer size - adjust this number as needed
-  const [graphData, setgraphData]= useState([]);
-  const [intervalID, setintervalID]= useState(null);
-  const [sensorData, setSensorData]= useState(null);
+  const [graphData, setgraphData] = useState([]);
+  const [intervalID, setintervalID] = useState(null);
+  const [sensorData, setSensorData] = useState(null);
 
-  const getData= async () => {
-    try{
-      // const response= await axios.get('http://192.168.181.254/json');
-      //sensor1: 5, sensor2: 10,
-      const response= await axios.get('http://localhost:5000/api/data');
+  const getData = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/data');
       setgraphData((prevgraphData) => {
-        // If we exceed buffer size, remove oldest data point
         if (prevgraphData.length >= BUFFER_SIZE) {
           return [...prevgraphData.slice(1), response.data];
         }
         return [...prevgraphData, response.data];
       });
       setSensorData(response.data);
-    }
-    catch(error){
+    } catch (error) {
       console.log(error);
     }
-  }
+  };
 
-  const getContinuousData =  () =>{
-    if(!intervalID){
-      const id= setInterval(getData,2000);
+  const getContinuousData = () => {
+    if (!intervalID) {
+      const id = setInterval(getData, 2000);
       setintervalID(id);
     }
-  }
+  };
 
   const downloadCSV = () => {
     const csvContent = "data:text/csv;charset=utf-8," +
-        "timestamp,voltage,\n" +  // Ensure newline after headers
-        graphData.map(data => 
-            `${data.Timestamp},${data.voltage}` // Ensure proper column separation
-        ).join("\n");
+      "timestamp,voltage,\n" +
+      graphData.map(data =>
+        `${data.Timestamp},${data.voltage}`
+      ).join("\n");
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -50,25 +47,24 @@ function App() {
     link.setAttribute("download", "sensor_data.csv");
     document.body.appendChild(link);
     link.click();
-};
+  };
 
-
-  const stopData =  () =>{
-    if(intervalID){
-       clearInterval(intervalID);
+  const stopData = () => {
+    if (intervalID) {
+      clearInterval(intervalID);
       setintervalID(null);
     }
-  }
+  };
 
-  const resetData =  () =>{
+  const resetData = () => {
     const userConfirmed = window.confirm("Do you want to download the CSV before resetting data?");
     if (userConfirmed) {
-        downloadCSV();
+      downloadCSV();
     }
     setSensorData(null);
     stopData();
     setgraphData([]);
-  }
+  };
 
   return (
     <Router>
@@ -79,6 +75,7 @@ function App() {
           element={
             <>
               <div className="container">
+                <img src={logo} alt="IITJ Logo" style={{ width: '50px', position: 'absolute', top: '10px', left: '10px' }} />
                 <h2>Sensor Dashboard</h2>
                 <div>
                   <Link to="/csvGraph" className="csv-link">
@@ -96,11 +93,6 @@ function App() {
                 {sensorData && (
                   <>
                     <div>Voltage Value: {sensorData.voltage}</div>
-                    {/* <div>Sensor 2 Value: {sensorData.value2}</div>
-                    <div>Sensor 3 Value: {sensorData.value3}</div>
-                    <div>Sensor 4 Value: {sensorData.value4}</div>
-                    <div>Temperature Value: {sensorData.Temperature}</div>
-                    <div>Humidity Value: {sensorData.Humidity}</div> */}
                   </>
                 )}
                 <div className="graph-container">
@@ -115,10 +107,9 @@ function App() {
   );
 }
 
-
 export default App;
 
-     
-      
-    
+
+
+
 
