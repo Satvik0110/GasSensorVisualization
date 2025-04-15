@@ -12,6 +12,7 @@ const Graph = ({ graphData }) => {
   const minY = Math.min(...voltages) - 0.01;
   const maxY = Math.max(...voltages) + 0.01;
 
+  
   const chartData = {
     labels: graphData.map((data) => new Date(data.timestamp).toLocaleTimeString()),  // human-readable time
     datasets: [
