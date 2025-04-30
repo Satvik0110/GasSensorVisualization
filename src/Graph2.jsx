@@ -4,33 +4,41 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const Graph = ({ graphData }) => {
+  // Extract voltage values
+  const voltages = graphData.map((data) => data.voltage); // Changed from voltage to voltage
 
-  // Extract voltages
-  const voltages = graphData.map((data) => data.voltage);
+  // Calculate min and max with larger margins for better visualization
+  const minY = Math.min(...voltages) - 0.01;  // Increased margin
+  const maxY = Math.max(...voltages) + 0.01;  // Increased margin
 
-  // Compute min and max of the data, with a small margin for visual clarity
-  const minY = Math.min(...voltages) - 0.01;
-  const maxY = Math.max(...voltages) + 0.01;
-
-  
   const chartData = {
-    labels: graphData.map((data) => new Date(data.timestamp).toLocaleTimeString()),  // human-readable time
+    labels: graphData.map((data) => new Date(data.timestamp).toLocaleTimeString()),
     datasets: [
       {
-        label: 'Voltage',
+        label: 'Sensor 1',  // Changed from Voltage to Sensor 1
         data: voltages,
         borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
         fill: false,
         tension: 0.1,
+        pointRadius: 3,  // Added point radius
+        pointHoverRadius: 5,  // Added hover radius
       }
     ],
   };
 
   const chartOptions = {
     responsive: true,
+    animation: {
+      duration: 0  // Disable animations for smoother updates
+    },
     plugins: {
       legend: { position: 'top' },
-      tooltip: { mode: 'index', intersect: false },
+      tooltip: { 
+        mode: 'index', 
+        intersect: false,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)'  // Added tooltip styling
+      },
     },
     scales: {
       x: {
@@ -38,15 +46,23 @@ const Graph = ({ graphData }) => {
         title: {
           display: true,
           text: 'Time',
+          font: { weight: 'bold' }
         },
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)'  // Lighter grid lines
+        }
       },
       y: {
-        min: minY,     // Dynamic lower bound
-        max: maxY,     // Dynamic upper bound
+        min: minY,
+        max: maxY,
         title: {
           display: true,
-          text: 'Volts',
+          text: 'Sensor Values',
+          font: { weight: 'bold' }
         },
+        grid: {
+          color: 'rgba(0, 0, 0, 0.1)'  // Lighter grid lines
+        }
       },
     },
   };
