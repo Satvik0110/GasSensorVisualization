@@ -14,7 +14,8 @@ function App() {
 
   const getData = async () => {
     try {
-      const response = await axios.get('http://10.115.139.170:5000/json');
+      const response = await axios.get('http://localhost:5000/api/data'); //Change this link to the Link Generataed by USP32
+      console.log(response.data);
       setgraphData((prevgraphData) => {
         if (prevgraphData.length >= BUFFER_SIZE) {
           return [...prevgraphData.slice(1), response.data];
