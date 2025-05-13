@@ -1,82 +1,61 @@
 import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import {
+  Chart as ChartJS, CategoryScale, LinearScale,
+  PointElement, LineElement, Title, Tooltip, Legend
+} from 'chart.js';
 
-// Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const Graph = ({ graphData }) => {
-  // Flatten all sensor values into one array
-  const allValues = [
-    ...graphData.map(data => data.value1),
-    ...graphData.map(data => data.value2),
-    ...graphData.map(data => data.value3),
-    ...graphData.map(data => data.value4),
-  ];
+const colors = [
+  'rgb(255, 99, 132)',
+  'rgb(54, 162, 235)',
+  'rgb(255, 206, 86)',
+  'rgb(75, 192, 192)',
+  'rgb(153, 102, 255)',
+  'rgb(255, 159, 64)',
+  'rgb(0, 200, 83)',
+  'rgb(255, 87, 34)'
+];
 
-  // Calculate dynamic min and max with a small margin
+const Graph = ({ graphData, numSensors }) => {
+  const allValues = [];
+  for (let i = 1; i <= numSensors; i++) {
+    allValues.push(...graphData.map(data => data[`value${i}`]));
+  }
+
   const minY = Math.min(...allValues) - 0.01;
   const maxY = Math.max(...allValues) + 0.01;
 
+  const datasets = [];
+  for (let i = 1; i <= numSensors; i++) {
+    datasets.push({
+      label: `Sensor ${i}`,
+      data: graphData.map(data => data[`value${i}`]),
+      borderColor: colors[(i - 1) % colors.length],
+      fill: false,
+      tension: 0.1,
+    });
+  }
+
   const chartData = {
-    labels: graphData.map(data => new Date(data.timestamp).toLocaleTimeString()), // X-axis labels (formatted timestamps)
-    datasets: [
-      {
-        label: 'Sensor 1',
-        data: graphData.map(data => data.value1),
-        borderColor: 'rgb(255, 99, 132)',
-        fill: false,
-        tension: 0.1,
-      },
-      {
-        label: 'Sensor 2',
-        data: graphData.map(data => data.value2),
-        borderColor: 'rgb(54, 162, 235)',
-        fill: false,
-        tension: 0.1,
-      },
-      {
-        label: 'Sensor 3',
-        data: graphData.map(data => data.value3),
-        borderColor: 'rgb(255, 206, 86)',
-        fill: false,
-        tension: 0.1,
-      },
-      {
-        label: 'Sensor 4',
-        data: graphData.map(data => data.value4),
-        borderColor: 'rgb(75, 192, 192)',
-        fill: false,
-        tension: 0.1,
-      },
-    ],
+    labels: graphData.map(data => new Date(data.Timestamp).toLocaleTimeString()),
+    datasets: datasets,
   };
 
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: {
-        position: 'top',
-      },
-      tooltip: {
-        mode: 'index',
-        intersect: false,
-      },
+      legend: { position: 'top' },
+      tooltip: { mode: 'index', intersect: false },
     },
     scales: {
       x: {
-        type: 'category',
-        title: {
-          display: true,
-          text: 'Time',
-        },
+        title: { display: true, text: 'Time' },
       },
       y: {
         min: minY,
         max: maxY,
-        title: {
-          display: true,
-          text: 'Volts',
-        },
+        title: { display: true, text: 'Volts' },
       },
     },
   };

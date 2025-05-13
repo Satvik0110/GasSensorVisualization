@@ -4,25 +4,38 @@ import { useState } from 'react';
 import Graph from './Graph';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import CSVGraph from './csvGraph';
-import logo from './IITJ_COLOURED.png'; // Import the logo
+import logo from './IITJ_COLOURED.png';
 
 function App() {
-  const BUFFER_SIZE = 50; // Define buffer size - adjust this number as needed
+  const BUFFER_SIZE = 50;
   const [graphData, setgraphData] = useState([]);
   const [intervalID, setintervalID] = useState(null);
   const [sensorData, setSensorData] = useState(null);
+  const [numSensors, setNumSensors] = useState(4); // Default value
+
+  const handleSensorInput = () => {
+    const input = parseInt(prompt("Enter number of sensors:"), 10);
+    if (!isNaN(input) && input > 0) {
+      setNumSensors(input);
+    } else {
+      alert("Please enter a valid positive number.");
+    }
+  };
 
   const getData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/data'); //Change this link to the Link Generataed by USP32
-      console.log(response.data);
-      setgraphData((prevgraphData) => {
-        if (prevgraphData.length >= BUFFER_SIZE) {
-          return [...prevgraphData.slice(1), response.data];
-        }
-        return [...prevgraphData, response.data];
-      });
-      setSensorData(response.data);
+      const response = await axios.get('http://192.168.116.254/json');
+      const newData = {
+        ...response.data,
+        Timestamp: new Date().toISOString(), // Add local timestamp
+      };
+
+      setgraphData(prevgraphData =>
+        prevgraphData.length >= BUFFER_SIZE
+          ? [...prevgraphData.slice(1), newData]
+          : [...prevgraphData, newData]
+      );
+      setSensorData(newData);
     } catch (error) {
       console.log(error);
     }
@@ -36,11 +49,19 @@ function App() {
   };
 
   const downloadCSV = () => {
+    let header = "timestamp";
+    for (let i = 1; i <= numSensors; i++) {
+      header += `,value${i}`;
+    }
     const csvContent = "data:text/csv;charset=utf-8," +
-      "timestamp,value1,value2,value3,value4\n" +
-      graphData.map(data =>
-        `${data.Timestamp},${data.value1},${data.value2},${data.value3},${data.value4}`
-      ).join("\n");
+      header + "\n" +
+      graphData.map(data => {
+        let row = `${data.Timestamp}`;
+        for (let i = 1; i <= numSensors; i++) {
+          row += `,${data[`value${i}`] ?? ''}`;
+        }
+        return row;
+      }).join("\n");
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -56,7 +77,6 @@ function App() {
       setintervalID(null);
     }
   };
-  
 
   const resetData = () => {
     const userConfirmed = window.confirm("Do you want to download the CSV before resetting data?");
@@ -80,30 +100,26 @@ function App() {
                 <img src={logo} alt="IITJ Logo" style={{ width: '150px', position: 'absolute', top: '10px', left: '10px' }} />
                 <h2>Sensor Dashboard</h2>
                 <div>
-                  <Link to="/csvGraph" className="csv-link">
-                    Go to CSV Graph
-                  </Link>
+                  <Link to="/csvGraph" className="csv-link">Go to CSV Graph</Link>
                 </div>
                 <p>Real-time sensor data visualization</p>
+                <button onClick={handleSensorInput}>Set Number of Sensors</button>
                 <div className="button-container">
-                  <button className="get-button" onClick={getContinuousData}>
-                    Get
-                  </button>
+                  <button className="get-button" onClick={getContinuousData}>Get</button>
                   <button className="stop-button" onClick={stopData}>Stop</button>
                   <button className="reset-button" onClick={resetData}>Reset</button>
                 </div>
                 {sensorData && (
-                  <>
-                    <div>Sensor 1 Value: {sensorData.value1}</div>
-                    <div>Sensor 2 Value: {sensorData.value2}</div>
-                    <div>Sensor 3 Value: {sensorData.value3}</div>
-                    <div>Sensor 4 Value: {sensorData.value4}</div>
+                  <div>
+                    {[...Array(numSensors)].map((_, i) => (
+                      <div key={i}>Sensor {i + 1} Value: {sensorData[`value${i + 1}`]}</div>
+                    ))}
                     <div>Temperature Value: {sensorData.temperature}</div>
                     <div>Humidity Value: {sensorData.humidity}</div>
-                  </>
+                  </div>
                 )}
                 <div className="graph-container">
-                  <Graph graphData={graphData} />
+                  <Graph graphData={graphData} numSensors={numSensors} />
                 </div>
               </div>
             </>
@@ -115,8 +131,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
