@@ -101,7 +101,7 @@ function App() {
             <>
               <div className="container">
                 <img src={logo} alt="IITJ Logo" style={{ width: '150px', position: 'absolute', top: '10px', left: '10px' }} />
-                <h2>Sensor Dashboard</h2>
+                <h2>Gas Sensor Array Data Visualization</h2>
                 <div>
                   <Link to="/csvGraph" className="csv-link">Go to CSV Graph</Link>
                 </div>

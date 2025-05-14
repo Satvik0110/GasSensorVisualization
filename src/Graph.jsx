@@ -55,7 +55,7 @@ const Graph = ({ graphData, numSensors }) => {
       y: {
         min: minY,
         max: maxY,
-        title: { display: true, text: 'Volts' },
+        title: { display: true, text: 'Voltage(V)' },
       },
     },
   };
