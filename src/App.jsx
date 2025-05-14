@@ -11,25 +11,27 @@ function App() {
   const [graphData, setgraphData] = useState([]);
   const [intervalID, setintervalID] = useState(null);
   const [sensorData, setSensorData] = useState(null);
-  const [numSensors, setNumSensors] = useState(4); // Default value
+  const [numSensors, setNumSensors] = useState(0); // Default value
 
-  const handleSensorInput = () => {
-    const input = parseInt(prompt("Enter number of sensors:"), 10);
-    if (!isNaN(input) && input > 0) {
-      setNumSensors(input);
-    } else {
-      alert("Please enter a valid positive number.");
-    }
-  };
+  
 
   const getData = async () => {
     try {
-      const response = await axios.get('http://192.168.116.254/json');
+      // const response = await axios.get('http://192.168.116.254/json');
+      const response = await axios.get('http://localhost:5000/api/data');
+      const { values = [], temperature, humidity } = response.data;
+  
       const newData = {
-        ...response.data,
-        Timestamp: new Date().toISOString(), // Add local timestamp
+        Timestamp: new Date().toISOString(),
+        temperature,
+        humidity,
       };
-
+  
+      values.forEach((val, index) => {
+        newData[`value${index + 1}`] = val;
+      });
+  
+      setNumSensors(values.length); // Set based on API
       setgraphData(prevgraphData =>
         prevgraphData.length >= BUFFER_SIZE
           ? [...prevgraphData.slice(1), newData]
@@ -40,6 +42,7 @@ function App() {
       console.log(error);
     }
   };
+  
 
   const getContinuousData = () => {
     if (!intervalID) {
@@ -103,7 +106,6 @@ function App() {
                   <Link to="/csvGraph" className="csv-link">Go to CSV Graph</Link>
                 </div>
                 <p>Real-time sensor data visualization</p>
-                <button onClick={handleSensorInput}>Set Number of Sensors</button>
                 <div className="button-container">
                   <button className="get-button" onClick={getContinuousData}>Get</button>
                   <button className="stop-button" onClick={stopData}>Stop</button>
